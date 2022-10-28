@@ -1,5 +1,6 @@
 package site.ownw.homepage.controller.todo;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,20 +31,23 @@ public class TodoController {
     @PreAuthorize("@authUtil.isMe(#userId)")
     @GetMapping("/api/v1/users/{userId}/todos")
     public List<Todo> todos(
-            @PathVariable Long userId, @RequestParam(required = false) TodoStatus status) {
+            @PathVariable @Schema(implementation = String.class) Long userId,
+            @RequestParam(required = false) TodoStatus status) {
         return todoService.getTodoList(userId, status);
     }
 
     @PostMapping("/api/v1/users/{userId}/todos")
-    public void create(@PathVariable Long userId, @Valid @RequestBody CreateTodoRequest request) {
+    public void create(
+            @PathVariable @Schema(implementation = String.class) Long userId,
+            @Valid @RequestBody CreateTodoRequest request) {
         todoService.create(userId, request);
     }
 
     @PreAuthorize("@authUtil.isMe(#userId)")
     @PutMapping("/api/v1/users/{userId}/todos/{todoId}/")
     public void update(
-            @PathVariable Long userId,
-            @PathVariable Long todoId,
+            @PathVariable @Schema(implementation = String.class) Long userId,
+            @PathVariable @Schema(implementation = String.class) Long todoId,
             @Valid @RequestBody UpdateTodoRequest request) {
         Todo todo =
                 todoRepository

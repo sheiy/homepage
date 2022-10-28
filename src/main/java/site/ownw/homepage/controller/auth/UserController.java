@@ -1,6 +1,7 @@
 package site.ownw.homepage.controller.auth;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
@@ -57,7 +58,9 @@ public class UserController {
 
     @PreAuthorize("@authUtil.isMe(#userId)")
     @PatchMapping("/api/v1/users/{userId}")
-    public void patchUser(@PathVariable Long userId, @Valid @RequestBody PatchUserRequest request) {
+    public void patchUser(
+            @PathVariable @Schema(implementation = String.class) Long userId,
+            @Valid @RequestBody PatchUserRequest request) {
         userService.patchUser(userId, request);
     }
 }

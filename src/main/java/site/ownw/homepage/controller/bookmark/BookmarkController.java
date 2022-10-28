@@ -1,5 +1,6 @@
 package site.ownw.homepage.controller.bookmark;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,22 +34,24 @@ public class BookmarkController {
 
     @PreAuthorize("@authUtil.isMe(#userId)")
     @GetMapping("/api/v1/users/{userId}/bookmark-groups")
-    public List<BookmarkGroupItem> getBookmarks(@PathVariable Long userId) {
+    public List<BookmarkGroupItem> getBookmarks(
+            @PathVariable @Schema(implementation = String.class) Long userId) {
         return bookmarkService.getBookmarks(userId);
     }
 
     @PreAuthorize("@authUtil.isMe(#userId)")
     @PostMapping("/api/v1/users/{userId}/bookmark-groups")
     public void createGroup(
-            @PathVariable Long userId, @Valid @RequestBody CreateGroupRequest request) {
+            @PathVariable @Schema(implementation = String.class) Long userId,
+            @Valid @RequestBody CreateGroupRequest request) {
         bookmarkService.createGroup(userId, request);
     }
 
     @PreAuthorize("@authUtil.isMe(#userId)")
     @PostMapping("/api/v1/users/{userId}/bookmark-groups/{bookmarkGroupId}")
     public void addBookmark(
-            @PathVariable Long userId,
-            @PathVariable Long bookmarkGroupId,
+            @PathVariable @Schema(implementation = String.class) Long userId,
+            @PathVariable @Schema(implementation = String.class) Long bookmarkGroupId,
             @Valid @RequestBody AddBookmarkRequest request) {
         BookmarkGroup bookmarkGroup =
                 bookmarkGroupRepository
@@ -63,9 +66,9 @@ public class BookmarkController {
     @PreAuthorize("@authUtil.isMe(#userId)")
     @DeleteMapping("/api/v1/users/{userId}/bookmark-groups/{bookmarkGroupId}/bookmarks/{bookmarkId}")
     public void deleteBookmark(
-            @PathVariable Long userId,
-            @PathVariable Long bookmarkGroupId,
-            @PathVariable Long bookmarkId) {
+            @PathVariable @Schema(implementation = String.class) Long userId,
+            @PathVariable @Schema(implementation = String.class) Long bookmarkGroupId,
+            @PathVariable @Schema(implementation = String.class) Long bookmarkId) {
         Bookmark bookmark =
                 bookmarkRepository
                         .findById(bookmarkId)
@@ -78,7 +81,9 @@ public class BookmarkController {
 
     @PreAuthorize("@authUtil.isMe(#userId)")
     @DeleteMapping("/api/v1/users/{userId}/bookmark-groups/{bookmarkGroupId}")
-    public void deleteGroup(@PathVariable Long userId, @PathVariable Long bookmarkGroupId) {
+    public void deleteGroup(
+            @PathVariable @Schema(implementation = String.class) Long userId,
+            @PathVariable @Schema(implementation = String.class) Long bookmarkGroupId) {
         BookmarkGroup bookmarkGroup =
                 bookmarkGroupRepository
                         .findById(bookmarkGroupId)
@@ -92,15 +97,16 @@ public class BookmarkController {
     @PreAuthorize("@authUtil.isMe(#userId)")
     @PostMapping("/api/v1/users/{userId}/bookmark-groups:sort")
     public void sortBookmarkGroup(
-            @PathVariable Long userId, @Valid @RequestBody SortBookmarkGroupRequest request) {
+            @PathVariable @Schema(implementation = String.class) Long userId,
+            @Valid @RequestBody SortBookmarkGroupRequest request) {
         bookmarkService.sortBookmarkGroup(userId, request);
     }
 
     @PreAuthorize("@authUtil.isMe(#userId)")
     @PostMapping("/api/v1/users/{userId}/bookmark-groups/{bookmarkGroupId}:sort")
     public void sortBookmarkGroup(
-            @PathVariable Long userId,
-            @PathVariable Long bookmarkGroupId,
+            @PathVariable @Schema(implementation = String.class) Long userId,
+            @PathVariable @Schema(implementation = String.class) Long bookmarkGroupId,
             @Valid @RequestBody SortBookmarkRequest request) {
         BookmarkGroup bookmarkGroup =
                 bookmarkGroupRepository

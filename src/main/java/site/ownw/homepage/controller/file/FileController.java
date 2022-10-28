@@ -1,6 +1,7 @@
 package site.ownw.homepage.controller.file;
 
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Schema;
 import java.io.IOException;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
@@ -39,7 +40,7 @@ public class FileController {
 
     @PreAuthorize("@authUtil.isMe(#userId)")
     @GetMapping("/api/v1/users/{userId}:getRootFolderId")
-    public Long getRootFolderId(@PathVariable Long userId) {
+    public Long getRootFolderId(@PathVariable @Schema(implementation = String.class) Long userId) {
         return fileService.getRootFolderId(userId);
     }
 
@@ -48,7 +49,9 @@ public class FileController {
             value = "/api/v1/users/{userId}/folders/{folderId}/files",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public void uploadFile(
-            @PathVariable Long userId, @PathVariable Long folderId, @RequestPart MultipartFile file) {
+            @PathVariable @Schema(implementation = String.class) Long userId,
+            @PathVariable @Schema(implementation = String.class) Long folderId,
+            @RequestPart MultipartFile file) {
         CreateFileParam param = new CreateFileParam();
         param.setFileName(file.getOriginalFilename());
         param.setContentType(file.getContentType());
@@ -65,15 +68,17 @@ public class FileController {
     @PreAuthorize("@authUtil.isMe(#userId)")
     @PostMapping(value = "/api/v1/users/{userId}/folders/{parentFolderId}")
     public void createFolder(
-            @PathVariable Long userId,
-            @PathVariable Long parentFolderId,
+            @PathVariable @Schema(implementation = String.class) Long userId,
+            @PathVariable @Schema(implementation = String.class) Long parentFolderId,
             @Valid @RequestBody CreateFolderRequest request) {
         fileService.createFolder(userId, parentFolderId, request);
     }
 
     @PreAuthorize("@authUtil.isMe(#userId)")
     @GetMapping(value = "/api/v1/users/{userId}/folders/{folderId}/files")
-    public List<GetFilesItem> getFiles(@PathVariable Long userId, @PathVariable Long folderId) {
+    public List<GetFilesItem> getFiles(
+            @PathVariable @Schema(implementation = String.class) Long userId,
+            @PathVariable @Schema(implementation = String.class) Long folderId) {
         UserFolder userFolder =
                 userFolderRepository
                         .findById(folderId)
@@ -87,8 +92,8 @@ public class FileController {
     @PreAuthorize("@authUtil.isMe(#userId)")
     @GetMapping(value = "/api/v1/users/{userId}/files/{fileId}")
     public void downloadFile(
-            @PathVariable Long userId,
-            @PathVariable Long fileId,
+            @PathVariable @Schema(implementation = String.class) Long userId,
+            @PathVariable @Schema(implementation = String.class) Long fileId,
             @Parameter(hidden = true) HttpServletResponse response) {
         UserFile userFile =
                 userFileRepository
@@ -110,7 +115,9 @@ public class FileController {
 
     @PreAuthorize("@authUtil.isMe(#userId)")
     @DeleteMapping(value = "/api/v1/users/{userId}/files/{fileId}")
-    public void deleteFile(@PathVariable Long userId, @PathVariable Long fileId) {
+    public void deleteFile(
+            @PathVariable @Schema(implementation = String.class) Long userId,
+            @PathVariable @Schema(implementation = String.class) Long fileId) {
         UserFile userFile =
                 userFileRepository
                         .findById(fileId)
@@ -123,7 +130,9 @@ public class FileController {
 
     @PreAuthorize("@authUtil.isMe(#userId)")
     @DeleteMapping(value = "/api/v1/users/{userId}/folders/{folderId}")
-    public void deleteFolder(@PathVariable Long userId, @PathVariable Long folderId) {
+    public void deleteFolder(
+            @PathVariable @Schema(implementation = String.class) Long userId,
+            @PathVariable @Schema(implementation = String.class) Long folderId) {
         UserFolder userFolder =
                 userFolderRepository
                         .findById(folderId)
