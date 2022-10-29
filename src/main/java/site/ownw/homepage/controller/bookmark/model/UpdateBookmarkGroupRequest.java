@@ -5,7 +5,7 @@ import javax.validation.constraints.NotBlank;
 import lombok.Data;
 
 @Data
-public class PatchBookmarkGroupRequest {
+public class UpdateBookmarkGroupRequest {
 
     @Parameter(required = true)
     @NotBlank

@@ -5,7 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import site.ownw.homepage.common.exception.BusinessException;
-import site.ownw.homepage.controller.auth.model.PatchUserRequest;
+import site.ownw.homepage.controller.auth.model.UpdateUserRequest;
 import site.ownw.homepage.domain.user.repository.UserRepository;
 import site.ownw.homepage.entity.User;
 
@@ -16,7 +16,7 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public void patchUser(Long userId, @Valid PatchUserRequest request) {
+    public void updateUser(Long userId, @Valid UpdateUserRequest request) {
         User user =
                 userRepository.findById(userId).orElseThrow(() -> new BusinessException("User NotFound"));
         user.setDefaultSearchEngine(request.getDefaultSearchEngine());

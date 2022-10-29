@@ -13,9 +13,10 @@ import org.springframework.validation.annotation.Validated;
 import site.ownw.homepage.common.exception.EntityNotFoundException;
 import site.ownw.homepage.controller.bookmark.model.AddBookmarkRequest;
 import site.ownw.homepage.controller.bookmark.model.CreateGroupRequest;
-import site.ownw.homepage.controller.bookmark.model.PatchBookmarkGroupRequest;
 import site.ownw.homepage.controller.bookmark.model.SortBookmarkGroupRequest;
 import site.ownw.homepage.controller.bookmark.model.SortBookmarkRequest;
+import site.ownw.homepage.controller.bookmark.model.UpdateBookmarkGroupRequest;
+import site.ownw.homepage.controller.bookmark.model.UpdateBookmarkRequest;
 import site.ownw.homepage.domain.bookmark.model.BookmarkGroupItem;
 import site.ownw.homepage.domain.bookmark.repository.BookmarkGroupRepository;
 import site.ownw.homepage.domain.bookmark.repository.BookmarkRepository;
@@ -107,12 +108,23 @@ public class BookmarkService {
         }
     }
 
-    public void patchBookmarkGroup(Long bookmarkGroupId, @Valid PatchBookmarkGroupRequest request) {
+    public void UpdateBookmarkGroup(Long bookmarkGroupId, @Valid UpdateBookmarkGroupRequest request) {
         BookmarkGroup bookmarkGroup =
                 bookmarkGroupRepository
                         .findById(bookmarkGroupId)
                         .orElseThrow(() -> new EntityNotFoundException("BookmarkGroup", bookmarkGroupId));
         bookmarkGroup.setName(request.getName());
         bookmarkGroupRepository.save(bookmarkGroup);
+    }
+
+    public void updateBookmark(Long bookmarkId, @Valid UpdateBookmarkRequest request) {
+        Bookmark bookmark =
+                bookmarkRepository
+                        .findById(bookmarkId)
+                        .orElseThrow(() -> new EntityNotFoundException("Bookmark", bookmarkId));
+        bookmark.setName(request.getName());
+        bookmark.setUrl(request.getUrl());
+        bookmark.setCleanUrl(cleanUrl(request.getUrl()));
+        bookmarkRepository.save(bookmark);
     }
 }
