@@ -193,7 +193,7 @@ public class BookmarkService {
             bookmark.setFavicon(getFavicon(bookmark.getCleanUrl()));
             bookmarkRepository.save(bookmark);
         } catch (IOException | URISyntaxException | InterruptedException e) {
-            throw new BusinessException("Update favicon error.", e.getLocalizedMessage());
+            throw new BusinessException("can not find favicon.", e.getLocalizedMessage());
         }
     }
 }
