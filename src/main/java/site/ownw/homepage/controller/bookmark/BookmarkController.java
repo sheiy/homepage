@@ -8,6 +8,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -51,7 +52,7 @@ public class BookmarkController {
     }
 
     @PreAuthorize("@authUtil.isMe(#userId)")
-    @PostMapping("/api/v1/users/{userId}/bookmark-groups/{bookmarkGroupId}")
+    @PostMapping("/api/v1/users/{userId}/bookmark-groups/{bookmarkGroupId}/bookmarks")
     public void addBookmark(
             @PathVariable @Schema(implementation = String.class) Long userId,
             @PathVariable @Schema(implementation = String.class) Long bookmarkGroupId,
@@ -152,5 +153,23 @@ public class BookmarkController {
             throw new AccessDeniedException("Not Allow");
         }
         bookmarkService.sortBookmark(bookmarkGroupId, request);
+    }
+
+    @PreAuthorize("@authUtil.isMe(#userId)")
+    @PatchMapping(
+            "/api/v1/users/{userId}/bookmark-groups/{bookmarkGroupId}/bookmarks/{bookmarkId}:updateFavicon")
+    public void updateFavicon(
+            @PathVariable @Schema(implementation = String.class) Long userId,
+            @PathVariable @Schema(implementation = String.class) Long bookmarkGroupId,
+            @PathVariable @Schema(implementation = String.class) Long bookmarkId,
+            @Valid @RequestBody SortBookmarkRequest request) {
+        Bookmark bookmark =
+                bookmarkRepository
+                        .findById(bookmarkId)
+                        .orElseThrow(() -> new EntityNotFoundException("Bookmark", bookmarkId));
+        if (!bookmark.getUserId().equals(userId)) {
+            throw new AccessDeniedException("Not Allow");
+        }
+        bookmarkService.updateFavicon(bookmarkId);
     }
 }

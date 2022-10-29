@@ -14,4 +14,8 @@ public interface BookmarkRepository extends PagingAndSortingRepository<Bookmark,
     @Modifying
     @Query("delete from `bookmark` where bookmark_group_id = :bookmarkGroupId")
     void deleteAllByBookmarkGroupId(Long bookmarkGroupId);
+
+    @Modifying
+    @Query("update `bookmark` set favicon = :favicon where id =:id")
+    void updateFaviconById(Long id, String favicon);
 }

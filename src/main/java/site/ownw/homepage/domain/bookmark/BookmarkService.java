@@ -1,15 +1,27 @@
 package site.ownw.homepage.domain.bookmark;
 
+import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.List;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+import site.ownw.homepage.common.exception.BusinessException;
 import site.ownw.homepage.common.exception.EntityNotFoundException;
 import site.ownw.homepage.controller.bookmark.model.AddBookmarkRequest;
 import site.ownw.homepage.controller.bookmark.model.CreateGroupRequest;
@@ -23,6 +35,7 @@ import site.ownw.homepage.domain.bookmark.repository.BookmarkRepository;
 import site.ownw.homepage.entity.Bookmark;
 import site.ownw.homepage.entity.BookmarkGroup;
 
+@Slf4j
 @Service
 @Validated
 @RequiredArgsConstructor
@@ -30,6 +43,8 @@ public class BookmarkService {
 
     private final BookmarkRepository bookmarkRepository;
     private final BookmarkGroupRepository bookmarkGroupRepository;
+    private final HttpClient httpClient;
+    private final ThreadPoolExecutor threadPoolExecutor;
 
     public void createGroup(Long userId, @Valid CreateGroupRequest request) {
         BookmarkGroup bookmarkGroup = new BookmarkGroup();
@@ -48,6 +63,7 @@ public class BookmarkService {
         bookmark.setCleanUrl(cleanUrl(request.getUrl()));
         bookmark.setSort(request.getSort());
         bookmarkRepository.save(bookmark);
+        updateFaviconAsync(bookmark.getId(), bookmark.getCleanUrl());
     }
 
     private String cleanUrl(String url) {
@@ -126,5 +142,58 @@ public class BookmarkService {
         bookmark.setUrl(request.getUrl());
         bookmark.setCleanUrl(cleanUrl(request.getUrl()));
         bookmarkRepository.save(bookmark);
+        updateFaviconAsync(bookmark.getId(), bookmark.getCleanUrl());
+    }
+
+    private void updateFaviconAsync(Long bookmarkId, String cleanUrl) {
+        threadPoolExecutor.submit(
+                new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            bookmarkRepository.updateFaviconById(bookmarkId, getFavicon(cleanUrl));
+                        } catch (Throwable t) {
+                            log.error("update bookmark:{} error.", bookmarkId, t);
+                        }
+                    }
+                });
+    }
+
+    private String getFavicon(String cleanUrl)
+            throws IOException, URISyntaxException, InterruptedException {
+        URI uri = new URI(cleanUrl);
+        String href;
+        Document doc = Jsoup.connect(cleanUrl).get();
+        Element icoElement = doc.head().select("link[href~=.*\\.(ico|png|svg)]").first();
+        if (icoElement != null) {
+            href = icoElement.attr("href");
+            if (href.startsWith("//")) {
+                href = uri.getScheme() + ":" + href;
+            }
+        } else {
+            href = cleanUrl + "/favicon.ico";
+        }
+        if (href.startsWith("/")) {
+            href = uri.getScheme() + "://" + uri.getHost() + href;
+        }
+        HttpRequest request = HttpRequest.newBuilder().uri(new URI(href)).GET().build();
+        int i = httpClient.send(request, HttpResponse.BodyHandlers.discarding()).statusCode();
+        if (HttpStatus.valueOf(i).is2xxSuccessful()) {
+            return href;
+        }
+        return null;
+    }
+
+    public void updateFavicon(Long bookmarkId) {
+        try {
+            Bookmark bookmark =
+                    bookmarkRepository
+                            .findById(bookmarkId)
+                            .orElseThrow(() -> new EntityNotFoundException("Bookmark", bookmarkId));
+            bookmark.setFavicon(getFavicon(bookmark.getCleanUrl()));
+            bookmarkRepository.save(bookmark);
+        } catch (IOException | URISyntaxException | InterruptedException e) {
+            throw new BusinessException("Update favicon error.", e.getLocalizedMessage());
+        }
     }
 }

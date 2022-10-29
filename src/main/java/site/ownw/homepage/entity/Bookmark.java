@@ -18,4 +18,6 @@ public class Bookmark extends AbstractEntity {
     private Integer sort;
 
     private Long userId;
+
+    private String favicon;
 }
