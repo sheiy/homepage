@@ -10,8 +10,10 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+import site.ownw.homepage.common.exception.EntityNotFoundException;
 import site.ownw.homepage.controller.bookmark.model.AddBookmarkRequest;
 import site.ownw.homepage.controller.bookmark.model.CreateGroupRequest;
+import site.ownw.homepage.controller.bookmark.model.PatchBookmarkGroupRequest;
 import site.ownw.homepage.controller.bookmark.model.SortBookmarkGroupRequest;
 import site.ownw.homepage.controller.bookmark.model.SortBookmarkRequest;
 import site.ownw.homepage.domain.bookmark.model.BookmarkGroupItem;
@@ -103,5 +105,14 @@ public class BookmarkService {
             bookmark.setSort(sort++);
             bookmarkRepository.save(bookmark);
         }
+    }
+
+    public void patchBookmarkGroup(Long bookmarkGroupId, @Valid PatchBookmarkGroupRequest request) {
+        BookmarkGroup bookmarkGroup =
+                bookmarkGroupRepository
+                        .findById(bookmarkGroupId)
+                        .orElseThrow(() -> new EntityNotFoundException("BookmarkGroup", bookmarkGroupId));
+        bookmarkGroup.setName(request.getName());
+        bookmarkGroupRepository.save(bookmarkGroup);
     }
 }
