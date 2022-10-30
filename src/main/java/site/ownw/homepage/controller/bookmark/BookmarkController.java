@@ -111,7 +111,7 @@ public class BookmarkController {
         if (!bookmarkGroup.getUserId().equals(userId)) {
             throw new AccessDeniedException("Not Allow");
         }
-        bookmarkService.UpdateBookmarkGroup(bookmarkGroupId, request);
+        bookmarkService.updateBookmarkGroup(bookmarkGroupId, request);
     }
 
     @PreAuthorize("@authUtil.isMe(#userId)")
@@ -152,7 +152,7 @@ public class BookmarkController {
         if (!bookmarkGroup.getUserId().equals(userId)) {
             throw new AccessDeniedException("Not Allow");
         }
-        bookmarkService.sortBookmark(bookmarkGroupId, request);
+        bookmarkService.sortBookmark(userId, bookmarkGroupId, request);
     }
 
     @PreAuthorize("@authUtil.isMe(#userId)")

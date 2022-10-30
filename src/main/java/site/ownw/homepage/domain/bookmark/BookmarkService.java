@@ -7,6 +7,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
@@ -99,32 +100,39 @@ public class BookmarkService {
 
     @Transactional
     public void sortBookmarkGroup(Long userId, @Valid SortBookmarkGroupRequest request) {
-        Iterable<BookmarkGroup> groups =
-                bookmarkGroupRepository.findAllById(request.getBookmarkGroupIds());
         int sort = 0;
-        for (BookmarkGroup group : groups) {
-            if (!group.getUserId().equals(userId)) {
-                throw new AccessDeniedException("Not Allow");
+        for (Long bookmarkGroupId : request.getBookmarkGroupIds()) {
+            Optional<BookmarkGroup> optionalBookmarkGroup =
+                    bookmarkGroupRepository.findById(bookmarkGroupId);
+            if (optionalBookmarkGroup.isPresent()) {
+                BookmarkGroup group = optionalBookmarkGroup.get();
+                if (!group.getUserId().equals(userId)) {
+                    throw new AccessDeniedException("Not Allow");
+                }
+                group.setSort(sort++);
+                bookmarkGroupRepository.save(group);
             }
-            group.setSort(sort++);
-            bookmarkGroupRepository.save(group);
         }
     }
 
     @Transactional
-    public void sortBookmark(Long bookmarkGroupId, @Valid SortBookmarkRequest request) {
-        Iterable<Bookmark> bookmarks = bookmarkRepository.findAllById(request.getBookmarkIds());
+    public void sortBookmark(Long userId, Long bookmarkGroupId, @Valid SortBookmarkRequest request) {
         int sort = 0;
-        for (Bookmark bookmark : bookmarks) {
-            if (!bookmark.getBookmarkGroupId().equals(bookmarkGroupId)) {
-                throw new AccessDeniedException("Not Allow");
+        for (Long bookmarkId : request.getBookmarkIds()) {
+            Optional<Bookmark> optionalBookmark = bookmarkRepository.findById(bookmarkId);
+            if (optionalBookmark.isPresent()) {
+                Bookmark bookmark = optionalBookmark.get();
+                if (!bookmark.getBookmarkGroupId().equals(bookmarkGroupId)
+                        || !bookmark.getUserId().equals(userId)) {
+                    throw new AccessDeniedException("Not Allow");
+                }
+                bookmark.setSort(sort++);
+                bookmarkRepository.save(bookmark);
             }
-            bookmark.setSort(sort++);
-            bookmarkRepository.save(bookmark);
         }
     }
 
-    public void UpdateBookmarkGroup(Long bookmarkGroupId, @Valid UpdateBookmarkGroupRequest request) {
+    public void updateBookmarkGroup(Long bookmarkGroupId, @Valid UpdateBookmarkGroupRequest request) {
         BookmarkGroup bookmarkGroup =
                 bookmarkGroupRepository
                         .findById(bookmarkGroupId)
