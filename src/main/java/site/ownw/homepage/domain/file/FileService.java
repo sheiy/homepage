@@ -96,6 +96,7 @@ public class FileService {
         for (UserFolder userFolder : userFolders) {
             GetFilesItem item = new GetFilesItem();
             item.setType(FileType.FOLDER);
+            item.setName(userFolder.getName());
             item.setId(userFolder.getId());
             result.add(item);
         }
