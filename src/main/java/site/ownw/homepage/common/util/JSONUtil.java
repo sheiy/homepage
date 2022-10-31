@@ -10,7 +10,7 @@ public class JSONUtil {
 
     @SneakyThrows
     public static String toJSON(Object object) {
-        return objectMapper.writeValueAsString(object);
+        return getObjectMapper().writeValueAsString(object);
     }
 
     @SneakyThrows

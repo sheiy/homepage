@@ -1,6 +1,7 @@
 package site.ownw.homepage.entity;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+import static site.ownw.homepage.common.Instance.STRING_OBJECT_TYPE_REFERENCE;
+
 import java.util.Map;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -11,9 +12,6 @@ import site.ownw.homepage.common.util.JSONUtil;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class SystemConfig extends AbstractEntity {
-
-    private static final TypeReference<Map<String, Object>> STRING_OBJECT_TYPE_REFERENCE =
-            new TypeReference<>() {};
 
     @Getter @Setter private String key;
 

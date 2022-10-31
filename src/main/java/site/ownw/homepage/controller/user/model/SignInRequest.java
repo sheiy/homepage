@@ -1,11 +1,11 @@
-package site.ownw.homepage.controller.auth.model;
+package site.ownw.homepage.controller.user.model;
 
 import io.swagger.v3.oas.annotations.Parameter;
 import javax.validation.constraints.Pattern;
 import lombok.Data;
 
 @Data
-public class SignUpRequest {
+public class SignInRequest {
 
     @Parameter(required = true)
     @Pattern(regexp = "[a-zA-Z0-9_-]{5,16}")

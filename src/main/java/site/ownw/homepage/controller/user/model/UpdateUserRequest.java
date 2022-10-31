@@ -1,4 +1,4 @@
-package site.ownw.homepage.controller.auth.model;
+package site.ownw.homepage.controller.user.model;
 
 import lombok.Data;
 import site.ownw.homepage.common.enums.SearchEngine;
