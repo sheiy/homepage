@@ -21,7 +21,11 @@ public class TodoService {
     private final TodoRepository todoRepository;
 
     public List<Todo> getTodoList(Long userId, TodoStatus status) {
-        Sort sort = Sort.by(Sort.Order.desc("remindDateTime"), Sort.Order.desc("createdAt"));
+        Sort sort =
+                Sort.by(
+                        Sort.Order.asc("status"),
+                        Sort.Order.asc("remindDateTime"),
+                        Sort.Order.desc("updatedAt"));
         if (status == null) {
             return todoRepository.findAllByUserId(userId, sort);
         } else {
@@ -35,7 +39,6 @@ public class TodoService {
         todo.setContent(request.getContent());
         todo.setStatus(TodoStatus.CREATED);
         todo.setRemindDateTime(request.getRemindDateTime());
-        todo.setRepeatStrategy(request.getRepeatStrategy());
         this.todoRepository.save(todo);
     }
 
@@ -47,7 +50,10 @@ public class TodoService {
         todo.setContent(request.getContent());
         todo.setStatus(request.getStatus());
         todo.setRemindDateTime(request.getRemindDateTime());
-        todo.setRepeatStrategy(request.getRepeatStrategy());
         this.todoRepository.save(todo);
+    }
+
+    public void delete(Long todoId) {
+        todoRepository.deleteById(todoId);
     }
 }

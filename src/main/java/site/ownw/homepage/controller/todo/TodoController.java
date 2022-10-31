@@ -6,6 +6,7 @@ import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -57,5 +58,20 @@ public class TodoController {
             throw new AccessDeniedException("Not Allow");
         }
         todoService.update(todoId, request);
+    }
+
+    @PreAuthorize("@authUtil.isMe(#userId)")
+    @DeleteMapping("/api/v1/users/{userId}/todos/{todoId}/")
+    public void delete(
+            @PathVariable @Schema(implementation = String.class) Long userId,
+            @PathVariable @Schema(implementation = String.class) Long todoId) {
+        Todo todo =
+                todoRepository
+                        .findById(todoId)
+                        .orElseThrow(() -> new EntityNotFoundException("Todo", todoId));
+        if (!todo.getUserId().equals(userId)) {
+            throw new AccessDeniedException("Not Allow");
+        }
+        todoService.delete(todoId);
     }
 }
