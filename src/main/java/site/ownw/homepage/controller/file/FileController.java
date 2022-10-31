@@ -40,8 +40,8 @@ public class FileController {
 
     @PreAuthorize("@authUtil.isMe(#userId)")
     @GetMapping("/api/v1/users/{userId}:getRootFolderId")
-    public Long getRootFolderId(@PathVariable @Schema(implementation = String.class) Long userId) {
-        return fileService.getRootFolderId(userId);
+    public String getRootFolderId(@PathVariable @Schema(implementation = String.class) Long userId) {
+        return fileService.getRootFolderId(userId).toString();
     }
 
     @PreAuthorize("@authUtil.isMe(#userId)")
