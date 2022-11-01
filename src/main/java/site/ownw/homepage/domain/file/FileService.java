@@ -18,6 +18,7 @@ import java.util.stream.Stream;
 import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import site.ownw.homepage.common.enums.FileType;
@@ -92,9 +93,11 @@ public class FileService {
 
     public List<GetFilesItem> getFiles(Long userId, Long userFolderId) {
         List<GetFilesItem> result = new ArrayList<>();
+        Sort sort = Sort.by(Sort.Order.desc("updatedAt"));
         List<UserFolder> userFolders =
-                userFolderRepository.findAllByUserIdAndParentFolderId(userId, userFolderId);
-        List<UserFile> userFiles = userFileRepository.findAllByUserIdAndFolderId(userId, userFolderId);
+                userFolderRepository.findAllByUserIdAndParentFolderId(userId, userFolderId, sort);
+        List<UserFile> userFiles =
+                userFileRepository.findAllByUserIdAndFolderId(userId, userFolderId, sort);
         for (UserFolder userFolder : userFolders) {
             GetFilesItem item = new GetFilesItem();
             item.setType(FileType.FOLDER);
