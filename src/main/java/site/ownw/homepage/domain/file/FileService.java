@@ -24,6 +24,8 @@ import site.ownw.homepage.common.enums.FileType;
 import site.ownw.homepage.common.exception.BusinessException;
 import site.ownw.homepage.common.exception.EntityNotFoundException;
 import site.ownw.homepage.controller.file.model.CreateFolderRequest;
+import site.ownw.homepage.controller.file.model.UpdateFileRequest;
+import site.ownw.homepage.controller.file.model.UpdateFolderRequest;
 import site.ownw.homepage.domain.file.model.CreateFileParam;
 import site.ownw.homepage.domain.file.model.GetFileResult;
 import site.ownw.homepage.domain.file.model.GetFilesItem;
@@ -209,5 +211,23 @@ public class FileService {
         if (!userRootFolder.toFile().exists() && !userRootFolder.toFile().mkdirs()) {
             throw new BusinessException("Create file error. Please try again later.");
         }
+    }
+
+    public void updateFolder(Long folderId, @Valid UpdateFolderRequest request) {
+        UserFolder userFolder =
+                userFolderRepository
+                        .findById(folderId)
+                        .orElseThrow(() -> new EntityNotFoundException("UserFolder", folderId));
+        userFolder.setName(request.getName());
+        userFolderRepository.save(userFolder);
+    }
+
+    public void updateFile(Long fileId, UpdateFileRequest request) {
+        UserFile userFile =
+                userFileRepository
+                        .findById(fileId)
+                        .orElseThrow(() -> new EntityNotFoundException("UserFile", fileId));
+        userFile.setName(request.getName());
+        userFileRepository.save(userFile);
     }
 }

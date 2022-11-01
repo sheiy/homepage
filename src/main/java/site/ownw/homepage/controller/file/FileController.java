@@ -21,6 +21,8 @@ import org.springframework.web.multipart.MultipartFile;
 import site.ownw.homepage.common.exception.BusinessException;
 import site.ownw.homepage.common.exception.EntityNotFoundException;
 import site.ownw.homepage.controller.file.model.CreateFolderRequest;
+import site.ownw.homepage.controller.file.model.UpdateFileRequest;
+import site.ownw.homepage.controller.file.model.UpdateFolderRequest;
 import site.ownw.homepage.domain.file.FileService;
 import site.ownw.homepage.domain.file.model.CreateFileParam;
 import site.ownw.homepage.domain.file.model.GetFileResult;
@@ -90,6 +92,23 @@ public class FileController {
     }
 
     @PreAuthorize("@authUtil.isMe(#userId)")
+    @GetMapping(value = "/api/v1/users/{userId}/folders/{folderId}/files/{fileId}")
+    public void updateFile(
+            @PathVariable @Schema(implementation = String.class) Long userId,
+            @PathVariable @Schema(implementation = String.class) Long folderId,
+            @PathVariable @Schema(implementation = String.class) Long fileId,
+            @RequestBody @Valid UpdateFileRequest request) {
+        UserFile userFile =
+                userFileRepository
+                        .findById(folderId)
+                        .orElseThrow(() -> new EntityNotFoundException("UserFile", fileId));
+        if (!userFile.getUserId().equals(userId)) {
+            throw new AccessDeniedException("Not Allow");
+        }
+        fileService.updateFile(fileId, request);
+    }
+
+    @PreAuthorize("@authUtil.isMe(#userId)")
     @GetMapping(value = "/api/v1/users/{userId}/files/{fileId}")
     public void downloadFile(
             @PathVariable @Schema(implementation = String.class) Long userId,
@@ -141,5 +160,21 @@ public class FileController {
             throw new AccessDeniedException("Not Allow");
         }
         fileService.deleteFolder(folderId);
+    }
+
+    @PreAuthorize("@authUtil.isMe(#userId)")
+    @DeleteMapping(value = "/api/v1/users/{userId}/folders/{folderId}")
+    public void updateFolder(
+            @PathVariable @Schema(implementation = String.class) Long userId,
+            @PathVariable @Schema(implementation = String.class) Long folderId,
+            @RequestBody @Valid UpdateFolderRequest request) {
+        UserFolder userFolder =
+                userFolderRepository
+                        .findById(folderId)
+                        .orElseThrow(() -> new EntityNotFoundException("UserFolder", folderId));
+        if (!userFolder.getUserId().equals(userId)) {
+            throw new AccessDeniedException("Not Allow");
+        }
+        fileService.updateFolder(folderId, request);
     }
 }
