@@ -106,7 +106,7 @@ public class FileController {
             @RequestBody @Valid UpdateFileRequest request) {
         UserFile userFile =
                 userFileRepository
-                        .findById(folderId)
+                        .findById(fileId)
                         .orElseThrow(() -> new EntityNotFoundException("UserFile", fileId));
         if (!userFile.getUserId().equals(userId)) {
             throw new AccessDeniedException("Not Allow");
