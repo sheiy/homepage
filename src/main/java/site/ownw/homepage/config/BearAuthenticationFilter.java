@@ -33,6 +33,9 @@ public class BearAuthenticationFilter extends BasicAuthenticationFilter {
             throws IOException, ServletException {
         String bearer = request.getHeader("Authorization");
         if (!StringUtils.hasText(bearer)) {
+            bearer = request.getParameter("authorization");
+        }
+        if (!StringUtils.hasText(bearer)) {
             chain.doFilter(request, response);
             return;
         }
