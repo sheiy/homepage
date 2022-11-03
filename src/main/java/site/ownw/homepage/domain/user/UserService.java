@@ -1,14 +1,13 @@
 package site.ownw.homepage.domain.user;
 
 import java.util.Map;
+import java.util.Optional;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import site.ownw.homepage.common.exception.BusinessException;
-import site.ownw.homepage.common.exception.EntityNotFoundException;
-import site.ownw.homepage.controller.user.model.CreateUserConfigRequest;
-import site.ownw.homepage.controller.user.model.UpdateUserConfigRequest;
+import site.ownw.homepage.controller.user.model.SaveUserConfigRequest;
 import site.ownw.homepage.controller.user.model.UpdateUserRequest;
 import site.ownw.homepage.domain.user.repository.UserConfigRepository;
 import site.ownw.homepage.domain.user.repository.UserRepository;
@@ -30,32 +29,29 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public void createUserConfig(
-            Long userId, String configKey, @Valid CreateUserConfigRequest request) {
-        if (userConfigRepository.findByUserIdAndKey(userId, configKey).isPresent()) {
-            throw new BusinessException("UserConfig:" + configKey + " is already exist");
-        }
-        UserConfig userConfig = new UserConfig();
-        userConfig.setKey(configKey);
-        userConfig.setMapValue(request.getValue());
-        userConfig.setUserId(userId);
-        userConfigRepository.save(userConfig);
-    }
-
-    public void updateUserConfig(
-            Long userId, String configKey, @Valid UpdateUserConfigRequest request) {
-        UserConfig userConfig =
-                userConfigRepository
-                        .findByUserIdAndKey(userId, configKey)
-                        .orElseThrow(() -> new EntityNotFoundException("UserConfig", configKey));
-        userConfig.setMapValue(request.getValue());
-        userConfigRepository.save(userConfig);
-    }
-
     public Map<String, Object> getUserConfig(Long userId, String configKey) {
-        return userConfigRepository
-                .findByUserIdAndKey(userId, configKey)
-                .orElseThrow(() -> new EntityNotFoundException("UserConfig", configKey))
-                .getMapValue();
+        Optional<UserConfig> optionalUserConfig =
+                userConfigRepository.findByUserIdAndKey(userId, configKey);
+        if (optionalUserConfig.isPresent()) {
+            return optionalUserConfig.get().getMapValue();
+        } else {
+            return Map.of();
+        }
+    }
+
+    public void saveUserConfig(Long userId, String configKey, SaveUserConfigRequest request) {
+        Optional<UserConfig> optionalUserConfig =
+                userConfigRepository.findByUserIdAndKey(userId, configKey);
+        UserConfig userConfig;
+        if (optionalUserConfig.isPresent()) {
+            userConfig = optionalUserConfig.get();
+            userConfig.setMapValue(request.getValue());
+        } else {
+            userConfig = new UserConfig();
+            userConfig.setKey(configKey);
+            userConfig.setMapValue(request.getValue());
+            userConfig.setUserId(userId);
+        }
+        userConfigRepository.save(userConfig);
     }
 }

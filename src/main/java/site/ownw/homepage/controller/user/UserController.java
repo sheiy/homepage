@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,17 +16,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import site.ownw.homepage.common.exception.EntityNotFoundException;
-import site.ownw.homepage.controller.user.model.CreateUserConfigRequest;
+import site.ownw.homepage.controller.user.model.SaveUserConfigRequest;
 import site.ownw.homepage.controller.user.model.SignInRequest;
 import site.ownw.homepage.controller.user.model.SignUpRequest;
-import site.ownw.homepage.controller.user.model.UpdateUserConfigRequest;
 import site.ownw.homepage.controller.user.model.UpdateUserRequest;
 import site.ownw.homepage.domain.user.AuthService;
 import site.ownw.homepage.domain.user.UserService;
 import site.ownw.homepage.domain.user.repository.UserConfigRepository;
 import site.ownw.homepage.entity.User;
-import site.ownw.homepage.entity.UserConfig;
 
 @Slf4j
 @RestController
@@ -81,27 +77,11 @@ public class UserController {
     }
 
     @PreAuthorize("@authUtil.isMe(#userId)")
-    @PutMapping("/api/v1/users/{userId}/configs/{configKey}")
-    public void updateUserConfig(
+    @PostMapping("/api/v1/users/{userId}/configs/{configKey}:saveUserConfig")
+    public void saveUserConfig(
             @PathVariable @Schema(implementation = String.class) Long userId,
             @PathVariable String configKey,
-            @RequestBody @Valid UpdateUserConfigRequest request) {
-        UserConfig userConfig =
-                userConfigRepository
-                        .findByUserIdAndKey(userId, configKey)
-                        .orElseThrow(() -> new EntityNotFoundException("UserConfig", configKey));
-        if (!userConfig.getUserId().equals(userId)) {
-            throw new AccessDeniedException("Not Allow");
-        }
-        userService.updateUserConfig(userId, configKey, request);
-    }
-
-    @PreAuthorize("@authUtil.isMe(#userId)")
-    @PostMapping("/api/v1/users/{userId}/configs/{configKey}")
-    public void createUserConfig(
-            @PathVariable @Schema(implementation = String.class) Long userId,
-            @PathVariable String configKey,
-            @RequestBody @Valid CreateUserConfigRequest request) {
-        userService.createUserConfig(userId, configKey, request);
+            @RequestBody @Valid SaveUserConfigRequest request) {
+        userService.saveUserConfig(userId, configKey, request);
     }
 }

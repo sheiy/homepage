@@ -6,7 +6,7 @@ import javax.validation.constraints.NotEmpty;
 import lombok.Data;
 
 @Data
-public abstract class BaseUserConfigRequest {
+public class SaveUserConfigRequest {
 
     @Parameter(required = true)
     @NotEmpty
