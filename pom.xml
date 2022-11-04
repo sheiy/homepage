@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>site.ownw</groupId>
-    <artifactId>homepage</artifactId>
+    <artifactId>homepage-backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>homepage</name>
     <description>homepage</description>
@@ -17,6 +17,7 @@
         <java.version>11</java.version>
         <spotless.version>2.27.1</spotless.version>
         <testcontainers.version>1.17.4</testcontainers.version>
+        <docker-prefix>registry.cn-chengdu.aliyuncs.com</docker-prefix>
     </properties>
     <dependencies>
         <dependency>
@@ -117,6 +118,22 @@
                             <artifactId>lombok</artifactId>
                         </exclude>
                     </excludes>
+                    <image>
+                        <name>${docker-prefix}/homepage_system/${project.artifactId}:latest</name>
+                        <publish>true</publish>
+                        <env>
+                            <!-- 添加启动参数则需要BPE_DELIM_JAVA_TOOL_OPTIONS -->
+                            <BPE_DELIM_JAVA_TOOL_OPTIONS xml:space="preserve"> </BPE_DELIM_JAVA_TOOL_OPTIONS>
+                            <BPE_APPEND_JAVA_TOOL_OPTIONS>-XX:+HeapDumpOnOutOfMemoryError</BPE_APPEND_JAVA_TOOL_OPTIONS>
+                        </env>
+                    </image>
+                    <docker>
+                        <publishRegistry>
+                            <username>35429674@qq.com</username>
+                            <password>ownw-docker</password>
+                            <url>https://${docker-prefix}</url>
+                        </publishRegistry>
+                    </docker>
                 </configuration>
             </plugin>
             <plugin>
