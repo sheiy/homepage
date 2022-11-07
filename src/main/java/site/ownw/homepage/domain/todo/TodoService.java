@@ -21,10 +21,7 @@ public class TodoService {
     private final TodoRepository todoRepository;
 
     public List<Todo> getTodoList(Long userId, TodoStatus status) {
-        Sort sort =
-                Sort.by(
-                        Sort.Order.asc("status"),
-                        Sort.Order.desc("createdAt"));
+        Sort sort = Sort.by(Sort.Order.asc("createdAt"));
         if (status == null) {
             return todoRepository.findAllByUserId(userId, sort);
         } else {
