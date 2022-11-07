@@ -24,8 +24,7 @@ public class TodoService {
         Sort sort =
                 Sort.by(
                         Sort.Order.asc("status"),
-                        Sort.Order.asc("remindDateTime"),
-                        Sort.Order.desc("updatedAt"));
+                        Sort.Order.desc("createdAt"));
         if (status == null) {
             return todoRepository.findAllByUserId(userId, sort);
         } else {
