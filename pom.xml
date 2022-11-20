@@ -119,7 +119,7 @@
                         </exclude>
                     </excludes>
                     <image>
-                        <name>${docker-prefix}/homepage_system/${project.artifactId}:latest</name>
+                        <name>${docker-prefix}/homepage_system/${project.artifactId}:${version}</name>
                         <publish>true</publish>
                         <env>
                             <!-- 添加启动参数则需要BPE_DELIM_JAVA_TOOL_OPTIONS -->
